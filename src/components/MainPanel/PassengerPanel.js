@@ -57,20 +57,23 @@ export default function PassengerPanel() {
     setSelectedRide(-1);
   }, [user]);
 
-  const handlePostRequest = () => {
+  const handlePostRequest = async () => {
     setIsPostRequestLoading.on();
-    PassengerAPI.postRequest(JSON.parse(requestBody))
-      .then(({ data }) => {
-        dispatch(
-          setMatcheRides({
-            id: user.id,
-            requestId: data.requestId,
-            matches: data.matches,
-          }),
-        );
-      })
-      .catch(console.log)
-      .finally(setIsPostRequestLoading.off);
+    try {
+      const {
+        data: { requestId, matches },
+      } = await PassengerAPI.postRequest(JSON.parse(requestBody));
+      dispatch(
+        setMatcheRides({
+          id: user.id,
+          requestId,
+          matches,
+        }),
+      );
+    } catch (error) {
+      console.log(error);
+    }
+    setIsPostRequestLoading.off();
   };
 
   const handlePostJoin = async () => {
@@ -81,26 +84,28 @@ export default function PassengerPanel() {
         rideId: ride.rideId,
         requestId: requestId,
       });
-      handleGetMatches();
     } catch (error) {
       console.log(error);
-    } finally {
-      setIsPostJoinLoading.off();
     }
+    handleGetMatches();
+    setIsPostJoinLoading.off();
   };
 
-  const handleGetMatches = () => {
-    PassengerAPI.getMatches({ requestId })
-      .then(({ data }) => {
-        dispatch(
-          setMatcheRides({
-            id: user.id,
-            requestId,
-            matches: data.matches,
-          }),
-        );
-      })
-      .catch(console.log);
+  const handleGetMatches = async () => {
+    try {
+      const {
+        data: { matches },
+      } = await PassengerAPI.getMatches({ requestId });
+      dispatch(
+        setMatcheRides({
+          id: user.id,
+          requestId,
+          matches,
+        }),
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -151,12 +156,21 @@ export default function PassengerPanel() {
                 </Button>
               </HStack>
               <VStack overflowY="scroll" alignItems="stretch">
-                {matches?.map(({ driverInfo }, index) => (
+                {matches?.map(({ status, driverInfo }, index) => (
                   <UserBox
                     key={`match-${user?.id}-${index}`}
                     user={driverInfo}
                     isActive={index === selectedRide}
                     onClick={() => setSelectedRide(index)}
+                    accessoryRight={
+                      status === 'unasked' ? (
+                        <Badge>unasked</Badge>
+                      ) : status === 'accepted' ? (
+                        <Badge colorScheme="green">accepted</Badge>
+                      ) : (
+                        <Badge colorScheme="yellow">pending</Badge>
+                      )
+                    }
                   />
                 ))}
               </VStack>
@@ -169,10 +183,6 @@ export default function PassengerPanel() {
                 px={3}
                 py={3}
               >
-                <HStack>
-                  <Tag size="sm">status</Tag>
-                  <JoinStatusBadge status={matches?.[selectedRide]?.status} />
-                </HStack>
                 <HStack>
                   <Tag size="sm">request_id</Tag>
                   <Text fontSize="sm">{requestId}</Text>
