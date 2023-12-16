@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import BeatLoader from 'react-spinners/BeatLoader';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-import { RepeatIcon } from '@chakra-ui/icons';
+import { CheckIcon, RepeatIcon } from '@chakra-ui/icons';
 import {
   Badge,
   Box,
@@ -13,6 +14,7 @@ import {
   Tag,
   Text,
   VStack,
+  useBoolean,
 } from '@chakra-ui/react';
 
 import { PassengerAPI } from '../../api';
@@ -40,6 +42,9 @@ const JoinStatusBadge = ({ status }) => (
 
 export default function PassengerPanel() {
   const [requestBody, setRequestBody] = useState(defaultRequest);
+  const [isPostRequestLoading, setIsPostRequestLoading] = useBoolean(false);
+  const [isPostJoinLoading, setIsPostJoinLoading] = useBoolean(false);
+
   const [selectedRide, setSelectedRide] = useState(-1);
 
   const dispatch = useDispatch();
@@ -49,6 +54,7 @@ export default function PassengerPanel() {
   );
 
   const handlePostRequest = () => {
+    setIsPostRequestLoading.on();
     PassengerAPI.postRequest(JSON.parse(requestBody))
       .then(({ data }) => {
         dispatch(
@@ -59,14 +65,24 @@ export default function PassengerPanel() {
           }),
         );
       })
-      .catch(console.log);
+      .catch(console.log)
+      .finally(setIsPostRequestLoading.off);
   };
 
-  const handlePostJoin = () => {
+  const handlePostJoin = async () => {
+    setIsPostJoinLoading.on();
     const ride = matches[selectedRide];
-    PassengerAPI.postJoin({ rideId: ride.rideId, requestId: requestId })
-      .then(({ data }) => {})
-      .catch(console.log);
+    try {
+      await PassengerAPI.postJoin({
+        rideId: ride.rideId,
+        requestId: requestId,
+      });
+      handleGetMatches();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsPostJoinLoading.off();
+    }
   };
 
   const handleGetMatches = () => {
@@ -83,8 +99,6 @@ export default function PassengerPanel() {
       .catch(console.log);
   };
 
-  
-
   return (
     <>
       <Box>
@@ -95,9 +109,20 @@ export default function PassengerPanel() {
           <Box width="100%">
             <CodeEditor value={requestBody} onValueChange={setRequestBody} />
           </Box>
-          <Button onClick={handlePostRequest} isDisabled={!user}>
-            發出需求
-          </Button>
+          {!requestId ? (
+            <Button
+              onClick={handlePostRequest}
+              isDisabled={!user}
+              isLoading={isPostRequestLoading}
+              spinner={<BeatLoader />}
+            >
+              發出需求
+            </Button>
+          ) : (
+            <Button isDisabled colorScheme="green" rightIcon={<CheckIcon />}>
+              已成功發出需求
+            </Button>
+          )}
         </VStack>
       </Box>
       <Box my={5}>
@@ -159,9 +184,20 @@ export default function PassengerPanel() {
               {selectedRide >= 0 &&
                 JSON.stringify(matches[selectedRide], null, 4)}
             </SyntaxHighlighter>
-            <Button isDisabled={selectedRide === -1} onClick={handlePostJoin}>
-              請求共乘
-            </Button>
+            {selectedRide === -1 || !matches[selectedRide].joinId ? (
+              <Button
+                isDisabled={selectedRide === -1}
+                onClick={handlePostJoin}
+                isLoading={isPostJoinLoading}
+                spinner={<BeatLoader />}
+              >
+                請求共乘
+              </Button>
+            ) : (
+              <Button isDisabled colorScheme="green" rightIcon={<CheckIcon />}>
+                已成功發出請求
+              </Button>
+            )}
           </VStack>
         </HStack>
       </Box>

@@ -5,10 +5,10 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import { RepeatIcon } from '@chakra-ui/icons';
+import { CheckIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
-  Flex,
   HStack,
   Heading,
   Tag,
@@ -29,6 +29,9 @@ import { UserBox } from '../Sidebar';
 function PostRideSection() {
   const dispatch = useDispatch();
   const user = useSelector(state => selectCurrentUser(state));
+  const { rideId } = useSelector(state =>
+    selectCurrentUserDriverActivity(state),
+  );
   const [rideBody, setRideBody] = useState(
     JSON.stringify(rideTemplates[0], null, 2),
   );
@@ -59,14 +62,20 @@ function PostRideSection() {
         <Box width="100%" maxH="20rem" overflowY="scroll">
           <CodeEditor value={rideBody} onValueChange={setRideBody} />
         </Box>
-        <Button
-          onClick={handlePostRide}
-          isDisabled={!user}
-          isLoading={isPostRideLoading}
-          spinner={<BeatLoader size={8} color="white" />}
-        >
-          發布行程
-        </Button>
+        {!rideId ? (
+          <Button
+            onClick={handlePostRide}
+            isDisabled={!user}
+            isLoading={isPostRideLoading}
+            spinner={<BeatLoader />}
+          >
+            發布行程
+          </Button>
+        ) : (
+          <Button isDisabled colorScheme="blue" rightIcon={<CheckIcon />}>
+            已成功發布行程
+          </Button>
+        )}
       </VStack>
     </Box>
   );
@@ -89,9 +98,13 @@ export default function DriverPanel() {
       .catch(console.log);
   };
 
-  const handleRespondJoin = (action) => () => {
-      DriverAPI.respondJoin({rideId, joinId: joins[selectedJoin].joinId, action})
-  }
+  const handleRespondJoin = action => () => {
+    DriverAPI.respondJoin({
+      rideId,
+      joinId: joins[selectedJoin].joinId,
+      action,
+    });
+  };
 
   return (
     <>
@@ -151,10 +164,18 @@ export default function DriverPanel() {
                 JSON.stringify(joins[selectedJoin], null, 4)}
             </SyntaxHighlighter>
             <HStack>
-              <Button onClick={handleRespondJoin('accept')} flex={2} isDisabled={selectedJoin === -1}>
+              <Button
+                onClick={handleRespondJoin('accept')}
+                flex={2}
+                isDisabled={selectedJoin === -1}
+              >
                 同意
               </Button>
-              <Button onClick={handleRespondJoin('reject')}  flex={1} isDisabled={selectedJoin === -1}>
+              <Button
+                onClick={handleRespondJoin('reject')}
+                flex={1}
+                isDisabled={selectedJoin === -1}
+              >
                 拒絕
               </Button>
             </HStack>
