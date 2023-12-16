@@ -191,7 +191,11 @@ export default function DriverPanel() {
               <SyntaxHighlighter
                 language="json"
                 style={oneLight}
-                customStyle={{ height: '17rem', fontSize: 12 }}
+                customStyle={{
+                  height: '17rem',
+                  maxWidth: '45rem',
+                  fontSize: 12,
+                }}
               >
                 {selectedJoin >= 0 &&
                   JSON.stringify(joins?.[selectedJoin], null, 4)}

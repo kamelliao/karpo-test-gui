@@ -180,7 +180,11 @@ export default function PassengerPanel() {
               <SyntaxHighlighter
                 language="json"
                 style={oneLight}
-                customStyle={{ height: '17rem', fontSize: 12 }}
+                customStyle={{
+                  height: '17rem',
+                  maxWidth: '45rem',
+                  fontSize: 12,
+                }}
               >
                 {selectedRide >= 0 &&
                   JSON.stringify(matches[selectedRide], null, 4)}
