@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import BeatLoader from 'react-spinners/BeatLoader';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -88,7 +88,11 @@ export default function DriverPanel() {
     selectCurrentUserDriverActivity(state),
   );
 
-  const [selectedJoin, setSelectedJoun] = useState(-1);
+  const [selectedJoin, setSelectedJoin] = useState(-1);
+
+  useEffect(() => {
+    setSelectedJoin(-1);
+  }, [user]);
 
   const handleGetJoins = () => {
     DriverAPI.getJoins({ rideId, status: 'pending' })
@@ -137,7 +141,7 @@ export default function DriverPanel() {
                   key={`join-${user?.id}-${index}`}
                   user={passengerInfo}
                   isActive={index === selectedJoin}
-                  onClick={() => setSelectedJoun(index)}
+                  onClick={() => setSelectedJoin(index)}
                 />
               ))}
             </VStack>

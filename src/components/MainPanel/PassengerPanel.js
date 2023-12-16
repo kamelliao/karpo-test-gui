@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import BeatLoader from 'react-spinners/BeatLoader';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -52,6 +52,10 @@ export default function PassengerPanel() {
   const { requestId, matches } = useSelector(state =>
     selectCurrentUserPassengerActivity(state),
   );
+
+  useEffect(() => {
+    setSelectedRide(-1);
+  }, [user]);
 
   const handlePostRequest = () => {
     setIsPostRequestLoading.on();
