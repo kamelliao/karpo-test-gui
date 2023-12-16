@@ -27,21 +27,10 @@ import { setMatcheRides } from '../../state/users';
 import CodeEditor from '../CodeEditor';
 import { UserBox } from '../UserBox';
 
-const defaultRequest = JSON.stringify(requestTemplates[0], null, 2);
-
-const JoinStatusBadge = ({ status }) => (
-  <Badge
-    fontSize="xs"
-    colorScheme={
-      status === 'unasked' ? 'gray' : status === 'pending' ? 'yellow' : 'green'
-    }
-  >
-    {status}
-  </Badge>
-);
-
 export default function PassengerPanel() {
-  const [requestBody, setRequestBody] = useState(defaultRequest);
+  const [requestBody, setRequestBody] = useState(
+    JSON.stringify(requestTemplates[0], null, 2),
+  );
   const [isPostRequestLoading, setIsPostRequestLoading] = useBoolean(false);
   const [isPostJoinLoading, setIsPostJoinLoading] = useBoolean(false);
 

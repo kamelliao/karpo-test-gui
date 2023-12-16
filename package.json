@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@anatine/zod-mock": "^3.13.3",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/css": "^11.11.2",
@@ -16,7 +15,6 @@
     "@testing-library/user-event": "^14.1.0",
     "add": "^2.0.6",
     "axios": "^1.6.2",
-    "framer-motion": "^6.2.9",
     "humps": "^2.0.1",
     "prism-themes": "^1.9.0",
     "prismjs": "^1.29.0",
@@ -29,10 +27,7 @@
     "react-simple-code-editor": "^0.13.1",
     "react-spinners": "^0.13.8",
     "react-syntax-highlighter": "^15.5.0",
-    "react-textarea-autosize": "^8.5.3",
-    "web-vitals": "^2.1.4",
-    "yarn": "^1.22.21",
-    "zod": "^3.22.4"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
