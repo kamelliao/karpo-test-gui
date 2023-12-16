@@ -55,9 +55,6 @@ function PostRideSection() {
 
   return (
     <Box>
-      <Heading size="md" py={2}>
-        發布共乘行程
-      </Heading>
       <VStack alignItems="stretch">
         <Box width="100%" maxH="20rem" overflowY="scroll">
           <CodeEditor value={rideBody} onValueChange={setRideBody} />

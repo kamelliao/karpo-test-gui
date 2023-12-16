@@ -106,9 +106,6 @@ export default function PassengerPanel() {
   return (
     <>
       <Box>
-        <Heading size="md" py={2}>
-          發布共乘需求
-        </Heading>
         <VStack alignItems="stretch">
           <Box width="100%">
             <CodeEditor value={requestBody} onValueChange={setRequestBody} />
@@ -188,7 +185,7 @@ export default function PassengerPanel() {
               {selectedRide >= 0 &&
                 JSON.stringify(matches[selectedRide], null, 4)}
             </SyntaxHighlighter>
-            {selectedRide === -1 || !matches[selectedRide].joinId ? (
+            {selectedRide === -1 || !matches[selectedRide]?.joinId ? (
               <Button
                 isDisabled={selectedRide === -1}
                 onClick={handlePostJoin}

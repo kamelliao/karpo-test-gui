@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import {
   Box,
+  Button,
+  ButtonGroup,
   HStack,
   Stack,
   Tab,
@@ -77,37 +79,38 @@ const UserCard = ({ user }) => {
 
 export default function MainPanel() {
   const user = useSelector(state => selectCurrentUser(state));
+  const [tab, setTab] = useState(0);
 
-  let content;
-  if (!user?.activity?.role) {
-    content = (
-      <Tabs isFitted variant="soft-rounded">
-        <TabList>
-          <Tab _selected={{ color: 'white', bg: 'green.400' }}>乘客</Tab>
-          <Tab _selected={{ color: 'white', bg: 'blue.400' }}>司機</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <PassengerPanel />
-          </TabPanel>
-          <TabPanel>
-            <DriverPanel />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    );
-  } else {
-    if (user.activity.role === 'passenger') {
-      content = <PassengerPanel />;
-    } else {
-      content = <DriverPanel />;
+  useEffect(() => {
+    if (user?.activity?.role) {
+      setTab(user?.activity?.role === 'passenger' ? 0 : 1);
     }
-  }
+  }, [user]);
 
   return (
     <MainPanelContainer>
       <UserCard user={user} />
-      <Box mt={5}>{content}</Box>
+      <Box>
+        <ButtonGroup width="100%" my={5} isDisabled={user?.activity?.role}>
+          <Button
+            flex={1}
+            colorScheme="green"
+            onClick={() => setTab(0)}
+            variant={tab === 0 ? 'solid' : 'ghost'}
+          >
+            乘客
+          </Button>
+          <Button
+            flex={1}
+            colorScheme="blue"
+            onClick={() => setTab(1)}
+            variant={tab === 1 ? 'solid' : 'ghost'}
+          >
+            司機
+          </Button>
+        </ButtonGroup>
+        <Box>{tab === 0 ? <PassengerPanel /> : <DriverPanel />}</Box>
+      </Box>
     </MainPanelContainer>
   );
 }
