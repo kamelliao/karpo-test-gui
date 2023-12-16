@@ -7,8 +7,10 @@ import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { RepeatIcon } from '@chakra-ui/icons';
 import { CheckIcon } from '@chakra-ui/icons';
 import {
+  Badge,
   Box,
   Button,
+  ButtonGroup,
   HStack,
   Heading,
   Tag,
@@ -24,7 +26,7 @@ import {
 } from '../../state/activity';
 import { getJoins, postRide } from '../../state/users';
 import CodeEditor from '../CodeEditor';
-import { UserBox } from '../Sidebar';
+import { UserBox } from '../UserBox';
 
 function PostRideSection() {
   const dispatch = useDispatch();
@@ -91,20 +93,42 @@ export default function DriverPanel() {
     setSelectedJoin(-1);
   }, [user]);
 
-  const handleGetJoins = () => {
-    DriverAPI.getJoins({ rideId, status: 'pending' })
-      .then(({ data }) => {
-        dispatch(getJoins({ id: user.id, joins: data.joins }));
-      })
-      .catch(console.log);
+  const handleGetJoins = async () => {
+    try {
+      const {
+        data: { joins: acceptedJoins },
+      } = await DriverAPI.getJoins({
+        rideId,
+        status: 'accepted',
+      });
+      const {
+        data: { joins: pendingJoins },
+      } = await DriverAPI.getJoins({
+        rideId,
+        status: 'pending',
+      });
+      const joins = [
+        ...acceptedJoins.map(join => ({ status: 'accepted', ...join })),
+        ...pendingJoins.map(join => ({ status: 'pending', ...join })),
+      ];
+      dispatch(getJoins({ id: user.id, joins }));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleRespondJoin = action => () => {
-    DriverAPI.respondJoin({
-      rideId,
-      joinId: joins[selectedJoin].joinId,
-      action,
-    });
+  const handleRespondJoin = action => async () => {
+    try {
+      await DriverAPI.respondJoin({
+        rideId,
+        joinId: joins[selectedJoin].joinId,
+        action,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    handleGetJoins();
   };
 
   return (
@@ -134,12 +158,19 @@ export default function DriverPanel() {
                 </Button>
               </HStack>
               <VStack overflowY="scroll" alignItems="stretch">
-                {joins?.map(({ passengerInfo }, index) => (
+                {joins?.map(({ status, passengerInfo }, index) => (
                   <UserBox
                     key={`join-${user?.id}-${index}`}
                     user={passengerInfo}
                     isActive={index === selectedJoin}
                     onClick={() => setSelectedJoin(index)}
+                    accessoryRight={
+                      status === 'accepted' ? (
+                        <Badge colorScheme="green">accepted</Badge>
+                      ) : (
+                        <Badge colorScheme="yellow">pending</Badge>
+                      )
+                    }
                   />
                 ))}
               </VStack>
@@ -165,22 +196,19 @@ export default function DriverPanel() {
                 {selectedJoin >= 0 &&
                   JSON.stringify(joins?.[selectedJoin], null, 4)}
               </SyntaxHighlighter>
-              <HStack>
-                <Button
-                  onClick={handleRespondJoin('accept')}
-                  flex={2}
-                  isDisabled={selectedJoin === -1}
-                >
+              <ButtonGroup
+                isDisabled={
+                  selectedJoin === -1 ||
+                  joins[selectedJoin].status === 'accepted'
+                }
+              >
+                <Button onClick={handleRespondJoin('accept')} flex={2}>
                   同意
                 </Button>
-                <Button
-                  onClick={handleRespondJoin('reject')}
-                  flex={1}
-                  isDisabled={selectedJoin === -1}
-                >
+                <Button onClick={handleRespondJoin('reject')} flex={1}>
                   拒絕
                 </Button>
-              </HStack>
+              </ButtonGroup>
             </VStack>
           </HStack>
         </Box>

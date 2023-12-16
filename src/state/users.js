@@ -23,6 +23,9 @@ export const usersSlice = createSlice({
       const { id, joins } = action.payload;
       const user = state.find(user => user.id === id);
       user.activity.joins = joins;
+      // user.activity.joins = {
+      //   [status]: joins.map(join => ({ status, ...join })),
+      // };
     },
   },
 });

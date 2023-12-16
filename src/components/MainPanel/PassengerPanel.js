@@ -25,7 +25,7 @@ import {
 } from '../../state/activity';
 import { setMatcheRides } from '../../state/users';
 import CodeEditor from '../CodeEditor';
-import { UserBox } from '../Sidebar';
+import { UserBox } from '../UserBox';
 
 const defaultRequest = JSON.stringify(requestTemplates[0], null, 2);
 

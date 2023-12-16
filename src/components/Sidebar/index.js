@@ -17,38 +17,7 @@ import { login, register } from '../../api';
 import { selectCurrentUser, selectUser } from '../../state/activity';
 import { addNewUser } from '../../state/users';
 import { genUser } from '../../utils/generator';
-
-export const UserBox = ({ user, isActive, role, onClick }) => {
-  const { name, email } = user;
-  const config = genConfig(name);
-
-  return (
-    <HStack
-      onClick={onClick}
-      paddingX={3}
-      paddingY={3}
-      borderRadius="lg"
-      {...(!role
-        ? null
-        : {
-            borderWidth: 1,
-            borderColor: role === 'passenger' ? 'green.400' : 'blue.400',
-          })}
-      backgroundColor={!isActive ? 'gray.50' : 'gray.200'}
-      transition=".3s"
-      _hover={{
-        backgroundColor: 'gray.200',
-        cursor: 'pointer',
-      }}
-    >
-      <Avatar style={{ width: '40px', height: '40px' }} {...config} />
-      <Flex direction="column">
-        <Text fontSize="sm">{name}</Text>
-        <Text fontSize="xs">{email}</Text>
-      </Flex>
-    </HStack>
-  );
-};
+import { UserBox } from '../UserBox';
 
 function SideBarContainer({ children }) {
   return (
