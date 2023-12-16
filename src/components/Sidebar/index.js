@@ -9,7 +9,7 @@ import { selectCurrentUser, selectUser } from '../../state/activity';
 import { addNewUser } from '../../state/users';
 import { genUser } from '../../utils/generator';
 
-export const UserBox = ({ user, isActive, onClick }) => {
+export const UserBox = ({ user, isActive, role, onClick }) => {
   const { name, email } = user;
   const config = genConfig(name);
 
@@ -19,6 +19,12 @@ export const UserBox = ({ user, isActive, onClick }) => {
       paddingX={3}
       paddingY={3}
       borderRadius="lg"
+      {...(!role
+        ? null
+        : {
+            borderWidth: 1,
+            borderColor: role === 'passenger' ? 'green.400' : 'blue.400',
+          })}
       backgroundColor={!isActive ? 'gray.50' : 'gray.200'}
       transition=".3s"
       _hover={{
@@ -100,6 +106,7 @@ export default function Sidebar() {
             <UserBox
               key={user.email}
               user={user}
+              role={user?.activity?.role}
               isActive={user.id === currentUser?.id}
               onClick={() => {
                 onSelectUser(user.id);
