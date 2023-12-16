@@ -118,7 +118,7 @@ export default function PassengerPanel() {
               onClick={handlePostRequest}
               isDisabled={!user}
               isLoading={isPostRequestLoading}
-              spinner={<BeatLoader />}
+              spinner={<BeatLoader size={8} color="white" />}
             >
               發出需求
             </Button>
@@ -193,7 +193,7 @@ export default function PassengerPanel() {
                 isDisabled={selectedRide === -1}
                 onClick={handlePostJoin}
                 isLoading={isPostJoinLoading}
-                spinner={<BeatLoader />}
+                spinner={<BeatLoader size={8} color="white" />}
               >
                 請求共乘
               </Button>

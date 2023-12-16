@@ -67,7 +67,7 @@ function PostRideSection() {
             onClick={handlePostRide}
             isDisabled={!user}
             isLoading={isPostRideLoading}
-            spinner={<BeatLoader />}
+            spinner={<BeatLoader size={8} color="white" />}
           >
             發布行程
           </Button>

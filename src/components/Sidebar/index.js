@@ -1,8 +1,17 @@
 import React from 'react';
 import Avatar, { genConfig } from 'react-nice-avatar';
 import { useDispatch, useSelector } from 'react-redux';
+import BeatLoader from 'react-spinners/BeatLoader';
 
-import { Box, Button, Flex, HStack, Stack, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Stack,
+  Text,
+  useBoolean,
+} from '@chakra-ui/react';
 
 import { login, register } from '../../api';
 import { selectCurrentUser, selectUser } from '../../state/activity';
@@ -73,8 +82,10 @@ export default function Sidebar() {
   const dispatch = useDispatch();
   const users = useSelector(state => state.users);
   const currentUser = useSelector(state => selectCurrentUser(state));
+  const [isRegisterLoading, setIsRegisterLoading] = useBoolean(false);
 
   const onNewUser = async () => {
+    setIsRegisterLoading.on();
     const user = genUser();
     try {
       const { data: userData } = await register(user);
@@ -92,6 +103,7 @@ export default function Sidebar() {
     } catch (error) {
       console.log(error);
     }
+    setIsRegisterLoading.off();
   };
 
   const onSelectUser = user => {
@@ -115,7 +127,12 @@ export default function Sidebar() {
           ))}
         </Stack>
         <Flex>
-          <Button flex={1} onClick={onNewUser}>
+          <Button
+            flex={1}
+            onClick={onNewUser}
+            isLoading={isRegisterLoading}
+            spinner={<BeatLoader size={8} color="white" />}
+          >
             新增使用者
           </Button>
         </Flex>
