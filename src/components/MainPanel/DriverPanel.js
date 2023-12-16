@@ -110,79 +110,81 @@ export default function DriverPanel() {
   return (
     <>
       <PostRideSection />
-      <Box my={5}>
-        <HStack>
-          <VStack
-            h="24em"
-            w="20em"
-            p={3}
-            borderRadius="md"
-            borderWidth={1}
-            alignItems="stretch"
-          >
-            <HStack>
-              <Heading flex={1} size="sm" textAlign="center">
-                乘客邀請列表
-              </Heading>
-              <Button
-                onClick={handleGetJoins}
-                size="sm"
-                rightIcon={<RepeatIcon />}
-              >
-                刷新
-              </Button>
-            </HStack>
-            <VStack overflowY="scroll" alignItems="stretch">
-              {joins?.map(({ passengerInfo }, index) => (
-                <UserBox
-                  key={`join-${user?.id}-${index}`}
-                  user={passengerInfo}
-                  isActive={index === selectedJoin}
-                  onClick={() => setSelectedJoin(index)}
-                />
-              ))}
-            </VStack>
-          </VStack>
-          <VStack flex={1} p={3} alignItems="stretch">
-            <Box
-              w="full"
+      {rideId && (
+        <Box my={5}>
+          <HStack>
+            <VStack
+              h="24em"
+              w="20em"
+              p={3}
               borderRadius="md"
-              backgroundColor="gray.50"
-              px={3}
-              py={3}
+              borderWidth={1}
+              alignItems="stretch"
             >
               <HStack>
-                <Tag size="sm">ride_id</Tag>
-                <Text fontSize="sm">{user?.activity?.rideId}</Text>
+                <Heading flex={1} size="sm" textAlign="center">
+                  乘客邀請列表
+                </Heading>
+                <Button
+                  onClick={handleGetJoins}
+                  size="sm"
+                  rightIcon={<RepeatIcon />}
+                >
+                  刷新
+                </Button>
               </HStack>
-            </Box>
-            <SyntaxHighlighter
-              language="json"
-              style={oneLight}
-              customStyle={{ height: '17rem', fontSize: 12 }}
-            >
-              {selectedJoin >= 0 &&
-                JSON.stringify(joins[selectedJoin], null, 4)}
-            </SyntaxHighlighter>
-            <HStack>
-              <Button
-                onClick={handleRespondJoin('accept')}
-                flex={2}
-                isDisabled={selectedJoin === -1}
+              <VStack overflowY="scroll" alignItems="stretch">
+                {joins?.map(({ passengerInfo }, index) => (
+                  <UserBox
+                    key={`join-${user?.id}-${index}`}
+                    user={passengerInfo}
+                    isActive={index === selectedJoin}
+                    onClick={() => setSelectedJoin(index)}
+                  />
+                ))}
+              </VStack>
+            </VStack>
+            <VStack flex={1} p={3} alignItems="stretch">
+              <Box
+                w="full"
+                borderRadius="md"
+                backgroundColor="gray.50"
+                px={3}
+                py={3}
               >
-                同意
-              </Button>
-              <Button
-                onClick={handleRespondJoin('reject')}
-                flex={1}
-                isDisabled={selectedJoin === -1}
+                <HStack>
+                  <Tag size="sm">ride_id</Tag>
+                  <Text fontSize="sm">{rideId}</Text>
+                </HStack>
+              </Box>
+              <SyntaxHighlighter
+                language="json"
+                style={oneLight}
+                customStyle={{ height: '17rem', fontSize: 12 }}
               >
-                拒絕
-              </Button>
-            </HStack>
-          </VStack>
-        </HStack>
-      </Box>
+                {selectedJoin >= 0 &&
+                  JSON.stringify(joins?.[selectedJoin], null, 4)}
+              </SyntaxHighlighter>
+              <HStack>
+                <Button
+                  onClick={handleRespondJoin('accept')}
+                  flex={2}
+                  isDisabled={selectedJoin === -1}
+                >
+                  同意
+                </Button>
+                <Button
+                  onClick={handleRespondJoin('reject')}
+                  flex={1}
+                  isDisabled={selectedJoin === -1}
+                >
+                  拒絕
+                </Button>
+              </HStack>
+            </VStack>
+          </HStack>
+        </Box>
+      )}
     </>
   );
 }

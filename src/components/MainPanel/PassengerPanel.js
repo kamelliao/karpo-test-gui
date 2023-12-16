@@ -126,82 +126,88 @@ export default function PassengerPanel() {
           )}
         </VStack>
       </Box>
-      <Box my={5}>
-        <HStack>
-          <VStack
-            h="24em"
-            w="20em"
-            p={3}
-            overflowY="scroll"
-            borderRadius="md"
-            borderWidth={1}
-            alignItems="stretch"
-          >
-            <HStack>
-              <Heading flex={1} size="sm" textAlign="center">
-                匹配司機列表
-              </Heading>
-              <Button
-                onClick={handleGetMatches}
-                size="sm"
-                rightIcon={<RepeatIcon />}
-              >
-                刷新
-              </Button>
-            </HStack>
-            <VStack overflowY="scroll" alignItems="stretch">
-              {matches?.map(({ driverInfo }, index) => (
-                <UserBox
-                  key={`match-${user?.id}-${index}`}
-                  user={driverInfo}
-                  isActive={index === selectedRide}
-                  onClick={() => setSelectedRide(index)}
-                />
-              ))}
-            </VStack>
-          </VStack>
-          <VStack flex={1} p={3} alignItems="stretch">
-            <HStack
-              w="full"
+      {requestId && (
+        <Box my={5}>
+          <HStack>
+            <VStack
+              h="24em"
+              w="20em"
+              p={3}
+              overflowY="scroll"
               borderRadius="md"
-              backgroundColor="gray.50"
-              px={3}
-              py={3}
+              borderWidth={1}
+              alignItems="stretch"
             >
               <HStack>
-                <Tag size="sm">status</Tag>
-                <JoinStatusBadge status={matches?.[selectedRide]?.status} />
+                <Heading flex={1} size="sm" textAlign="center">
+                  匹配司機列表
+                </Heading>
+                <Button
+                  onClick={handleGetMatches}
+                  size="sm"
+                  rightIcon={<RepeatIcon />}
+                >
+                  刷新
+                </Button>
               </HStack>
-              <HStack>
-                <Tag size="sm">request_id</Tag>
-                <Text fontSize="sm">{requestId}</Text>
-              </HStack>
-            </HStack>
-            <SyntaxHighlighter
-              language="json"
-              style={oneLight}
-              customStyle={{ height: '17rem', fontSize: 12 }}
-            >
-              {selectedRide >= 0 &&
-                JSON.stringify(matches[selectedRide], null, 4)}
-            </SyntaxHighlighter>
-            {selectedRide === -1 || !matches[selectedRide]?.joinId ? (
-              <Button
-                isDisabled={selectedRide === -1}
-                onClick={handlePostJoin}
-                isLoading={isPostJoinLoading}
-                spinner={<BeatLoader size={8} color="white" />}
+              <VStack overflowY="scroll" alignItems="stretch">
+                {matches?.map(({ driverInfo }, index) => (
+                  <UserBox
+                    key={`match-${user?.id}-${index}`}
+                    user={driverInfo}
+                    isActive={index === selectedRide}
+                    onClick={() => setSelectedRide(index)}
+                  />
+                ))}
+              </VStack>
+            </VStack>
+            <VStack flex={1} p={3} alignItems="stretch">
+              <HStack
+                w="full"
+                borderRadius="md"
+                backgroundColor="gray.50"
+                px={3}
+                py={3}
               >
-                請求共乘
-              </Button>
-            ) : (
-              <Button isDisabled colorScheme="green" rightIcon={<CheckIcon />}>
-                已成功發出請求
-              </Button>
-            )}
-          </VStack>
-        </HStack>
-      </Box>
+                <HStack>
+                  <Tag size="sm">status</Tag>
+                  <JoinStatusBadge status={matches?.[selectedRide]?.status} />
+                </HStack>
+                <HStack>
+                  <Tag size="sm">request_id</Tag>
+                  <Text fontSize="sm">{requestId}</Text>
+                </HStack>
+              </HStack>
+              <SyntaxHighlighter
+                language="json"
+                style={oneLight}
+                customStyle={{ height: '17rem', fontSize: 12 }}
+              >
+                {selectedRide >= 0 &&
+                  JSON.stringify(matches[selectedRide], null, 4)}
+              </SyntaxHighlighter>
+              {selectedRide === -1 || !matches[selectedRide]?.joinId ? (
+                <Button
+                  isDisabled={selectedRide === -1}
+                  onClick={handlePostJoin}
+                  isLoading={isPostJoinLoading}
+                  spinner={<BeatLoader size={8} color="white" />}
+                >
+                  請求共乘
+                </Button>
+              ) : (
+                <Button
+                  isDisabled
+                  colorScheme="green"
+                  rightIcon={<CheckIcon />}
+                >
+                  已成功發出請求
+                </Button>
+              )}
+            </VStack>
+          </HStack>
+        </Box>
+      )}
     </>
   );
 }
