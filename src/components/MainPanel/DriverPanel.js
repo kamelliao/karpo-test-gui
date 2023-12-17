@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import BeatLoader from 'react-spinners/BeatLoader';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import { RepeatIcon } from '@chakra-ui/icons';
 import { CheckIcon } from '@chakra-ui/icons';
@@ -28,6 +26,7 @@ import {
 import { getJoins, postRide } from '../../state/users';
 import CodeEditor from '../CodeEditor';
 import { Field } from '../Field';
+import { SyntaxHighlighter } from '../SyntaxHighlighter';
 import { UserBox } from '../UserBox';
 
 function PostRideSection() {
@@ -188,18 +187,7 @@ export default function DriverPanel() {
               >
                 <Field field="ride_id" value={rideId} />
               </Box>
-              <SyntaxHighlighter
-                language="json"
-                style={oneLight}
-                lineProps={{
-                  style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' },
-                }}
-                wrapLines={true}
-                customStyle={{
-                  height: '17rem',
-                  fontSize: 12,
-                }}
-              >
+              <SyntaxHighlighter language="json">
                 {selectedJoin >= 0 &&
                   JSON.stringify(joins?.[selectedJoin], null, 4)}
               </SyntaxHighlighter>

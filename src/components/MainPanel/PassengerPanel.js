@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import BeatLoader from 'react-spinners/BeatLoader';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import { CheckIcon, RepeatIcon } from '@chakra-ui/icons';
 import {
@@ -27,6 +25,7 @@ import {
 import { setMatcheRides } from '../../state/users';
 import CodeEditor from '../CodeEditor';
 import { Field } from '../Field';
+import { SyntaxHighlighter } from '../SyntaxHighlighter';
 import { UserBox } from '../UserBox';
 
 export default function PassengerPanel() {
@@ -177,18 +176,7 @@ export default function PassengerPanel() {
               >
                 <Field field="request_id" value={requestId} />
               </Box>
-              <SyntaxHighlighter
-                language="json"
-                style={oneLight}
-                lineProps={{
-                  style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' },
-                }}
-                wrapLines={true}
-                customStyle={{
-                  height: '17rem',
-                  fontSize: 12,
-                }}
-              >
+              <SyntaxHighlighter language="json">
                 {selectedRide >= 0 &&
                   JSON.stringify(matches[selectedRide], null, 4)}
               </SyntaxHighlighter>
