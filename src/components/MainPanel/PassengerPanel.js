@@ -9,11 +9,12 @@ import {
   Badge,
   Box,
   Button,
+  Flex,
   HStack,
   Heading,
-  Tag,
-  Text,
   VStack,
+  Wrap,
+  WrapItem,
   useBoolean,
 } from '@chakra-ui/react';
 
@@ -25,6 +26,7 @@ import {
 } from '../../state/activity';
 import { setMatcheRides } from '../../state/users';
 import CodeEditor from '../CodeEditor';
+import { Field } from '../Field';
 import { UserBox } from '../UserBox';
 
 export default function PassengerPanel() {
@@ -122,10 +124,11 @@ export default function PassengerPanel() {
       </Box>
       {requestId && (
         <Box my={5}>
-          <HStack>
+          <Flex gap={3} flexWrap="wrap">
             <VStack
+              flex={1}
               h="24em"
-              w="20em"
+              minWidth="15rem"
               p={3}
               overflowY="scroll"
               borderRadius="md"
@@ -164,25 +167,25 @@ export default function PassengerPanel() {
                 ))}
               </VStack>
             </VStack>
-            <VStack flex={1} p={3} alignItems="stretch">
-              <HStack
+            <VStack flex={2} alignItems="stretch">
+              <Box
                 w="full"
                 borderRadius="md"
                 backgroundColor="gray.50"
                 px={3}
                 py={3}
               >
-                <HStack>
-                  <Tag size="sm">request_id</Tag>
-                  <Text fontSize="sm">{requestId}</Text>
-                </HStack>
-              </HStack>
+                <Field field="request_id" value={requestId} />
+              </Box>
               <SyntaxHighlighter
                 language="json"
                 style={oneLight}
+                lineProps={{
+                  style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' },
+                }}
+                wrapLines={true}
                 customStyle={{
                   height: '17rem',
-                  maxWidth: '45rem',
                   fontSize: 12,
                 }}
               >
@@ -208,7 +211,7 @@ export default function PassengerPanel() {
                 </Button>
               )}
             </VStack>
-          </HStack>
+          </Flex>
         </Box>
       )}
     </>

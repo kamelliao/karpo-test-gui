@@ -5,26 +5,24 @@ import {
   Box,
   Button,
   ButtonGroup,
-  HStack,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Tag,
-  Text,
+  Wrap,
+  WrapItem,
+  useMediaQuery,
 } from '@chakra-ui/react';
 
 import { selectCurrentUser } from '../../state/activity';
+import { Field } from '../Field';
 import DriverPanel from './DriverPanel';
 import PassengerPanel from './PassengerPanel';
 
 function MainPanelContainer({ props, children }) {
+  const [isLargerThan992] = useMediaQuery('(min-width: 992px)');
+  const width = isLargerThan992 ? 'calc(100% - 300px)' : 'calc(100% - 90px)';
+
   return (
     <Box
       {...props}
-      w="calc(100% - 300px)"
+      w={width}
       __css={{
         float: 'right',
         maxWidth: '100%',
@@ -50,29 +48,31 @@ const UserCard = ({ user }) => {
   const { id, name, email, password, accessToken } = user ?? {};
 
   return (
-    <Box w="full" borderRadius="md" backgroundColor="gray.50" px={3} py={3}>
-      <Stack>
-        <HStack>
-          <Tag>id</Tag>
-          <Text>{id}</Text>
-        </HStack>
-        <HStack>
-          <Tag>name</Tag>
-          <Text>{name}</Text>
-        </HStack>
-        <HStack>
-          <Tag>email</Tag>
-          <Text>{email}</Text>
-        </HStack>
-        <HStack>
-          <Tag>password</Tag>
-          <Text>{password}</Text>
-        </HStack>
-        <HStack>
-          <Tag>accessToken</Tag>
-          <Text>{accessToken}</Text>
-        </HStack>
-      </Stack>
+    <Box
+      w="full"
+      borderRadius="md"
+      backgroundColor="gray.50"
+      px={3}
+      py={3}
+      overflowX="scroll"
+    >
+      <Wrap>
+        <WrapItem>
+          <Field field="id" value={id} />
+        </WrapItem>
+        <WrapItem>
+          <Field field="name" value={name} />
+        </WrapItem>
+        <WrapItem>
+          <Field field="email" value={email} />
+        </WrapItem>
+        <WrapItem>
+          <Field field="password" value={password} />
+        </WrapItem>
+        <WrapItem>
+          <Field field="accessToken" value={accessToken} />
+        </WrapItem>
+      </Wrap>
     </Box>
   );
 };

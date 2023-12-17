@@ -11,6 +11,7 @@ import {
   Stack,
   Text,
   useBoolean,
+  useMediaQuery,
 } from '@chakra-ui/react';
 import { toPng } from 'html-to-image';
 
@@ -20,14 +21,14 @@ import { addNewUser } from '../../state/users';
 import { genUser } from '../../utils/generator';
 import { UserBox } from '../UserBox';
 
-function SideBarContainer({ children }) {
+function SideBarContainer({ width = '300px', children }) {
   return (
-    <Box position="fixed" backgroundColor="white">
+    <Box position="fixed">
       <Flex
-        bg="none"
+        backgroundColor="white"
         transition="0.2s linear"
-        w="300px"
-        maxW="300px"
+        w={width}
+        maxW={width}
         ms={{
           sm: '16px',
         }}
@@ -56,7 +57,7 @@ const AvatarSource = ({ id, name }) => {
   }, [name]);
 
   return (
-    <Flex style={{ zIndex: -1, position: 'absolute' }}>
+    <Flex style={{ zIndex: -1, position: 'absolute', left: '-1000px' }}>
       <Avatar id={id} style={{ width: '200px', height: '200px' }} {...config} />
     </Flex>
   );
@@ -67,6 +68,7 @@ export default function Sidebar() {
   const users = useSelector(state => state.users);
   const currentUser = useSelector(state => selectCurrentUser(state));
   const [isRegisterLoading, setIsRegisterLoading] = useBoolean(false);
+  const [isLargerThan992] = useMediaQuery('(min-width: 992px)');
 
   const [user, setUser] = useState(genUser());
 
@@ -104,7 +106,7 @@ export default function Sidebar() {
   return (
     <>
       <AvatarSource id="avatar-source" name={user.name} />
-      <SideBarContainer>
+      <SideBarContainer width={isLargerThan992 ? '300px' : '90px'}>
         <Flex
           flex={1}
           gap={3}
@@ -116,6 +118,7 @@ export default function Sidebar() {
               <UserBox
                 key={user.email}
                 user={user}
+                variant={isLargerThan992 ? 'base' : 'simple'}
                 role={user?.activity?.role}
                 isActive={user.id === currentUser?.id}
                 onClick={() => {
@@ -131,7 +134,7 @@ export default function Sidebar() {
               isLoading={isRegisterLoading}
               spinner={<BeatLoader size={8} color="white" />}
             >
-              新增使用者
+              {isLargerThan992 ? '新增使用者' : '+'}
             </Button>
           </Flex>
         </Flex>

@@ -3,7 +3,14 @@ import Avatar, { genConfig } from 'react-nice-avatar';
 
 import { Flex, HStack, Text } from '@chakra-ui/react';
 
-export const UserBox = ({ user, isActive, role, onClick, accessoryRight }) => {
+export const UserBox = ({
+  user,
+  isActive,
+  role,
+  variant,
+  onClick,
+  accessoryRight,
+}) => {
   const { name, email } = user;
   const config = genConfig(name);
 
@@ -29,10 +36,12 @@ export const UserBox = ({ user, isActive, role, onClick, accessoryRight }) => {
     >
       <HStack>
         <Avatar style={{ width: '40px', height: '40px' }} {...config} />
-        <Flex direction="column">
-          <Text fontSize="sm">{name}</Text>
-          <Text fontSize="xs">{email}</Text>
-        </Flex>
+        {variant !== 'simple' && (
+          <Flex direction="column">
+            <Text fontSize="sm">{name}</Text>
+            <Text fontSize="xs">{email}</Text>
+          </Flex>
+        )}
       </HStack>
       {accessoryRight}
     </HStack>

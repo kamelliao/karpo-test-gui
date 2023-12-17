@@ -11,6 +11,7 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Flex,
   HStack,
   Heading,
   Tag,
@@ -26,6 +27,7 @@ import {
 } from '../../state/activity';
 import { getJoins, postRide } from '../../state/users';
 import CodeEditor from '../CodeEditor';
+import { Field } from '../Field';
 import { UserBox } from '../UserBox';
 
 function PostRideSection() {
@@ -136,10 +138,11 @@ export default function DriverPanel() {
       <PostRideSection />
       {rideId && (
         <Box my={5}>
-          <HStack>
+          <Flex gap={3} flexWrap="wrap">
             <VStack
+              flex={1}
               h="24em"
-              w="20em"
+              minWidth="15rem"
               p={3}
               borderRadius="md"
               borderWidth={1}
@@ -175,7 +178,7 @@ export default function DriverPanel() {
                 ))}
               </VStack>
             </VStack>
-            <VStack flex={1} p={3} alignItems="stretch">
+            <VStack flex={2} alignItems="stretch">
               <Box
                 w="full"
                 borderRadius="md"
@@ -183,17 +186,17 @@ export default function DriverPanel() {
                 px={3}
                 py={3}
               >
-                <HStack>
-                  <Tag size="sm">ride_id</Tag>
-                  <Text fontSize="sm">{rideId}</Text>
-                </HStack>
+                <Field field="ride_id" value={rideId} />
               </Box>
               <SyntaxHighlighter
                 language="json"
                 style={oneLight}
+                lineProps={{
+                  style: { wordBreak: 'break-all', whiteSpace: 'pre-wrap' },
+                }}
+                wrapLines={true}
                 customStyle={{
                   height: '17rem',
-                  maxWidth: '45rem',
                   fontSize: 12,
                 }}
               >
@@ -214,7 +217,7 @@ export default function DriverPanel() {
                 </Button>
               </ButtonGroup>
             </VStack>
-          </HStack>
+          </Flex>
         </Box>
       )}
     </>
