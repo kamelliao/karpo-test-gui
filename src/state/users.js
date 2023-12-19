@@ -15,9 +15,9 @@ export const usersSlice = createSlice({
       user.activity = { role: 'passenger', requestId, matches };
     },
     postRide: (state, action) => {
-      const { id, rideId } = action.payload;
+      const { id, rideId, ride } = action.payload;
       const user = state.find(user => user.id === id);
-      user.activity = { role: 'driver', rideId };
+      user.activity = { role: 'driver', rideId, ride };
     },
     getJoins: (state, action) => {
       const { id, joins } = action.payload;
@@ -27,10 +27,31 @@ export const usersSlice = createSlice({
       //   [status]: joins.map(join => ({ status, ...join })),
       // };
     },
+    getRide: (state, action) => {
+      const { id, rideId, ride } = action.payload;
+      const user = state.find(user => user.id === id);
+      user.activity = { ...user.activity, role: 'driver', rideId, ride };
+    },
+    getRequest: (state, action) => {
+      const { id, requestId, request } = action.payload;
+      const user = state.find(user => user.id === id);
+      user.activity = {
+        ...user.activity,
+        role: 'passenger',
+        requestId,
+        request,
+      };
+    },
   },
 });
 
-export const { addNewUser, setMatcheRides, postRide, getJoins } =
-  usersSlice.actions;
+export const {
+  addNewUser,
+  setMatcheRides,
+  postRide,
+  getJoins,
+  getRide,
+  getRequest,
+} = usersSlice.actions;
 
 export default usersSlice.reducer;

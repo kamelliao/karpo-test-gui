@@ -22,7 +22,7 @@ api.interceptors.response.use(response => {
 
 api.interceptors.request.use(config => {
   const token = selectCurrentUser(store.getState())?.accessToken;
-  if (token) {
+  if (token && !config.headers?.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
@@ -49,6 +49,21 @@ export const login = ({ username, password }) => {
   });
 };
 
+export const UsersAPI = {
+  getActivity: () => {
+    return api.get(`/users/me/active_items`);
+  },
+};
+
+export const CommonAPI = {
+  getRide: rideId => {
+    return api.get(`/rides/${rideId}`);
+  },
+  getRequest: requestId => {
+    return api.get(`/requests/${requestId}`);
+  },
+};
+
 export const PassengerAPI = {
   postRequest: body => {
     return api.post(`/requests`, body);
@@ -61,6 +76,24 @@ export const PassengerAPI = {
   },
   getJoinStatus: ({ rideId, joinId }) => {
     return api.get(`/rides/${rideId}/joins/${joinId}/status`);
+  },
+  postRequestAgent: ({ token, body }) => {
+    return api.post(`/requests`, body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+  postJoinAgent: ({ token, rideId, requestId }) => {
+    return api.post(
+      `/rides/${rideId}/joins`,
+      { requestId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
   },
 };
 

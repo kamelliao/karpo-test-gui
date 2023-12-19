@@ -4,7 +4,7 @@ import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CheckIcon, CopyIcon } from '@chakra-ui/icons';
 import { Box, IconButton, useClipboard } from '@chakra-ui/react';
 
-export function SyntaxHighlighter({ language, children }) {
+export function SyntaxHighlighter({ language, height = '20rem', children }) {
   const { onCopy, hasCopied } = useClipboard(children);
 
   return (
@@ -34,7 +34,7 @@ export function SyntaxHighlighter({ language, children }) {
         }}
         wrapLines={true}
         customStyle={{
-          height: '17rem',
+          height,
           fontSize: 12,
         }}
       >

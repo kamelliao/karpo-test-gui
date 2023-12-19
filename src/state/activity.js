@@ -39,6 +39,11 @@ export const selectCurrentUserDriverActivity = createSelector(
   }),
 );
 
+export const selectInactiveUsers = createSelector(
+  state => state.users,
+  users => users.filter(user => !user?.activity),
+);
+
 export const { selectUser } = activitySlice.actions;
 
 export default activitySlice.reducer;

@@ -12,20 +12,23 @@ import {
   Flex,
   HStack,
   Heading,
+  IconButton,
   Tag,
-  Text,
   VStack,
+  WrapItem,
+  useBoolean,
 } from '@chakra-ui/react';
 
-import { DriverAPI } from '../../api';
+import { CommonAPI, DriverAPI, PassengerAPI } from '../../api';
 import { rideTemplates } from '../../data/rideTemplates';
 import {
   selectCurrentUser,
   selectCurrentUserDriverActivity,
+  selectInactiveUsers,
 } from '../../state/activity';
-import { getJoins, postRide } from '../../state/users';
+import { getJoins, getRequest, postRide } from '../../state/users';
+import { genRequest } from '../../utils/generator';
 import CodeEditor from '../CodeEditor';
-import { Field } from '../Field';
 import { SyntaxHighlighter } from '../SyntaxHighlighter';
 import { UserBox } from '../UserBox';
 
@@ -39,21 +42,20 @@ function PostRideSection() {
     JSON.stringify(rideTemplates[0], null, 2),
   );
   const [isPostRideLoading, setIsPostRideLoading] = useState(false);
-  const handlePostRide = () => {
+  const handlePostRide = async () => {
     setIsPostRideLoading(true);
-    DriverAPI.postRide(JSON.parse(rideBody))
-      .then(({ data }) => {
-        dispatch(
-          postRide({
-            id: user.id,
-            rideId: data.rideId,
-          }),
-        );
-      })
-      .catch(console.log)
-      .finally(() => {
-        setIsPostRideLoading(false);
-      });
+    try {
+      const {
+        data: { rideId },
+      } = await DriverAPI.postRide(JSON.parse(rideBody));
+      const {
+        data: { ride },
+      } = await CommonAPI.getRide(rideId);
+      dispatch(postRide({ id: user.id, rideId, ride }));
+    } catch (error) {
+      console.log(error);
+    }
+    setIsPostRideLoading(false);
   };
 
   return (
@@ -76,6 +78,59 @@ function PostRideSection() {
             已成功發布行程
           </Button>
         )}
+      </VStack>
+    </Box>
+  );
+}
+
+function ActivitySection() {
+  const user = useSelector(state => selectCurrentUser(state));
+  const inActiveUsers = useSelector(state => selectInactiveUsers(state));
+  const dispatch = useDispatch();
+
+  const [isCreatePassengerLoading, setIsCreatePassengerLoading] =
+    useBoolean(false);
+
+  const onCreatePassenger = async () => {
+    setIsCreatePassengerLoading.on();
+    const newUser = inActiveUsers.pop();
+    const request = genRequest(user.activity.ride);
+    try {
+      const {
+        data: { requestId },
+      } = await PassengerAPI.postRequestAgent({
+        token: newUser.accessToken,
+        body: request,
+      });
+      await PassengerAPI.postJoinAgent({
+        token: newUser.accessToken,
+        rideId: user.activity.rideId,
+        requestId,
+      });
+      dispatch(getRequest({ id: newUser.id, requestId, request }));
+    } catch (error) {
+      console.log(error);
+    }
+    setIsCreatePassengerLoading.off();
+  };
+
+  return (
+    <Box>
+      <VStack alignItems="stretch">
+        <Box width="100%">
+          <SyntaxHighlighter language="json" height="15rem">
+            {JSON.stringify(user?.activity?.ride, null, 2)}
+          </SyntaxHighlighter>
+        </Box>
+
+        <Button
+          isDisabled={inActiveUsers.length <= 0}
+          isLoading={isCreatePassengerLoading}
+          spinner={<BeatLoader size={8} color="white" />}
+          onClick={onCreatePassenger}
+        >
+          產生乘客
+        </Button>
       </VStack>
     </Box>
   );
@@ -132,81 +187,80 @@ export default function DriverPanel() {
     handleGetJoins();
   };
 
+  if (!rideId) {
+    return <PostRideSection />;
+  }
+
   return (
     <>
-      <PostRideSection />
-      {rideId && (
-        <Box my={5}>
-          <Flex gap={3} flexWrap="wrap">
-            <VStack
-              flex={1}
-              h="24em"
-              minWidth="15rem"
-              p={3}
-              borderRadius="md"
-              borderWidth={1}
-              alignItems="stretch"
-            >
-              <HStack>
-                <Heading flex={1} size="sm" textAlign="center">
-                  乘客邀請列表
-                </Heading>
-                <Button
-                  onClick={handleGetJoins}
-                  size="sm"
-                  rightIcon={<RepeatIcon />}
-                >
-                  刷新
-                </Button>
-              </HStack>
-              <VStack overflowY="scroll" alignItems="stretch">
-                {joins?.map(({ status, passengerInfo }, index) => (
-                  <UserBox
-                    key={`join-${user?.id}-${index}`}
-                    user={passengerInfo}
-                    isActive={index === selectedJoin}
-                    onClick={() => setSelectedJoin(index)}
-                    accessoryRight={
-                      status === 'accepted' ? (
-                        <Badge colorScheme="green">accepted</Badge>
-                      ) : (
-                        <Badge colorScheme="yellow">pending</Badge>
-                      )
-                    }
-                  />
-                ))}
-              </VStack>
-            </VStack>
-            <VStack flex={2} alignItems="stretch">
-              <Box
-                w="full"
+      {!rideId ? (
+        <PostRideSection />
+      ) : (
+        <>
+          <ActivitySection />
+          <Box my={5}>
+            <Flex gap={3} flexWrap="wrap">
+              <VStack
+                flex={1}
+                h="24em"
+                minWidth="15rem"
+                p={3}
                 borderRadius="md"
-                backgroundColor="gray.50"
-                px={3}
-                py={3}
+                borderWidth={1}
+                alignItems="stretch"
               >
-                <Field field="ride_id" value={rideId} />
-              </Box>
-              <SyntaxHighlighter language="json">
-                {selectedJoin >= 0 &&
-                  JSON.stringify(joins?.[selectedJoin], null, 4)}
-              </SyntaxHighlighter>
-              <ButtonGroup
-                isDisabled={
-                  selectedJoin === -1 ||
-                  joins[selectedJoin].status === 'accepted'
-                }
-              >
-                <Button onClick={handleRespondJoin('accept')} flex={2}>
-                  同意
-                </Button>
-                <Button onClick={handleRespondJoin('reject')} flex={1}>
-                  拒絕
-                </Button>
-              </ButtonGroup>
-            </VStack>
-          </Flex>
-        </Box>
+                <HStack>
+                  <Heading flex={1} size="sm" textAlign="center">
+                    乘客邀請列表
+                  </Heading>
+                  <Button
+                    onClick={handleGetJoins}
+                    size="sm"
+                    rightIcon={<RepeatIcon />}
+                  >
+                    刷新
+                  </Button>
+                </HStack>
+                <VStack overflowY="scroll" alignItems="stretch">
+                  {joins?.map(({ status, passengerInfo }, index) => (
+                    <UserBox
+                      key={`join-${user?.id}-${index}`}
+                      user={passengerInfo}
+                      isActive={index === selectedJoin}
+                      onClick={() => setSelectedJoin(index)}
+                      accessoryRight={
+                        status === 'accepted' ? (
+                          <Badge colorScheme="green">accepted</Badge>
+                        ) : (
+                          <Badge colorScheme="yellow">pending</Badge>
+                        )
+                      }
+                    />
+                  ))}
+                </VStack>
+              </VStack>
+              <VStack flex={2} alignItems="stretch">
+                <SyntaxHighlighter language="json" height="20rem">
+                  {selectedJoin >= 0 &&
+                    JSON.stringify(joins?.[selectedJoin], null, 4)}
+                </SyntaxHighlighter>
+                <ButtonGroup
+                  isDisabled={
+                    selectedJoin === -1 ||
+                    joins[selectedJoin].status === 'accepted'
+                  }
+                >
+                  <Button onClick={handleRespondJoin('accept')} flex={2}>
+                    同意
+                  </Button>
+                  <Button onClick={handleRespondJoin('reject')} flex={1}>
+                    拒絕
+                  </Button>
+                </ButtonGroup>
+              </VStack>
+            </Flex>
+          </Box>
+        </>
       )}
     </>
   );
