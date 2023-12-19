@@ -2,7 +2,7 @@ import { fakerZH_TW as faker } from '@faker-js/faker';
 
 export const genUser = () => {
   return {
-    name: faker.person.fullName(),
+    name: faker.person.firstName(),
     email: faker.internet.email({ provider: 'gmail.com' }),
     password: '000000',
   };
@@ -19,6 +19,9 @@ function generateTwoUniqueNumbers(min, max) {
     num2 = getRandomInt(min, max);
   }
 
+  if (num1 > num2) {
+    return [num2, num1];
+  }
   return [num1, num2];
 }
 
