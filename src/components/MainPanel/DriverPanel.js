@@ -39,7 +39,7 @@ function PostRideSection() {
     selectCurrentUserDriverActivity(state),
   );
   const [rideBody, setRideBody] = useState(
-    JSON.stringify(rideTemplates[0], null, 2),
+    JSON.stringify(rideTemplates[1], null, 2),
   );
   const [isPostRideLoading, setIsPostRideLoading] = useState(false);
   const handlePostRide = async () => {
