@@ -13,11 +13,13 @@ import {
   HStack,
   Heading,
   IconButton,
-  Tag,
+  Text,
   VStack,
   WrapItem,
   useBoolean,
 } from '@chakra-ui/react';
+import { format } from 'date-fns';
+import { zhTW } from 'date-fns/locale';
 
 import { CommonAPI, DriverAPI, PassengerAPI } from '../../api';
 import { rideTemplates } from '../../data/rideTemplates';
@@ -32,6 +34,33 @@ import CodeEditor from '../CodeEditor';
 import { SyntaxHighlighter } from '../SyntaxHighlighter';
 import { UserBox } from '../UserBox';
 
+const RideBox = ({ time, origin, destination, onClick, isActive = false }) => (
+  <HStack
+    onClick={onClick}
+    paddingX={3}
+    paddingY={3}
+    borderRadius="lg"
+    backgroundColor={!isActive ? 'gray.50' : 'gray.200'}
+    transition=".3s"
+    _hover={{
+      backgroundColor: 'gray.200',
+      cursor: 'pointer',
+    }}
+    justifyContent="space-between"
+  >
+    <VStack alignItems="stretch">
+      <Text fontSize="sm">{time}</Text>
+      <HStack>
+        <Text fontSize="sm" minWidth={180}>
+          {origin}
+        </Text>
+        <Text fontSize="sm">→</Text>
+        <Text fontSize="sm">{destination}</Text>
+      </HStack>
+    </VStack>
+  </HStack>
+);
+
 function PostRideSection() {
   const dispatch = useDispatch();
   const user = useSelector(state => selectCurrentUser(state));
@@ -39,7 +68,7 @@ function PostRideSection() {
     selectCurrentUserDriverActivity(state),
   );
   const [rideBody, setRideBody] = useState(
-    JSON.stringify(rideTemplates[1], null, 2),
+    JSON.stringify(rideTemplates[0], null, 2),
   );
   const [isPostRideLoading, setIsPostRideLoading] = useState(false);
   const handlePostRide = async () => {
@@ -61,9 +90,40 @@ function PostRideSection() {
   return (
     <Box>
       <VStack alignItems="stretch">
-        <Box width="100%" maxH="20rem" overflowY="scroll">
-          <CodeEditor value={rideBody} onValueChange={setRideBody} />
-        </Box>
+        <HStack>
+          <VStack
+            flex={1}
+            h="20em"
+            minWidth="18rem"
+            p={3}
+            borderRadius="md"
+            borderWidth={1}
+            alignItems="stretch"
+          >
+            <HStack>
+              <Heading flex={1} size="sm" textAlign="center">
+                司機邀請範本
+              </Heading>
+            </HStack>
+            <VStack overflowY="scroll" alignItems="stretch">
+              {rideTemplates.map((ride, index) => (
+                <RideBox
+                  key={`request-${index}`}
+                  onClick={() => setRideBody(JSON.stringify(ride, null, 2))}
+                  time={format(ride.departure_time, 'LLLdo EE p', {
+                    locale: zhTW,
+                  })}
+                  origin={ride.origin.description}
+                  destination={ride.destination.description}
+                />
+              ))}
+            </VStack>
+          </VStack>
+          <Box width="60%" maxH="20rem" overflowY="scroll">
+            <CodeEditor value={rideBody} onValueChange={setRideBody} />
+          </Box>
+        </HStack>
+
         {!rideId ? (
           <Button
             onClick={handlePostRide}

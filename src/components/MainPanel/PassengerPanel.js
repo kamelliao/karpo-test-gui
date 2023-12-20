@@ -10,11 +10,14 @@ import {
   Flex,
   HStack,
   Heading,
+  Text,
   VStack,
   Wrap,
   WrapItem,
   useBoolean,
 } from '@chakra-ui/react';
+import { format } from 'date-fns';
+import { zhTW } from 'date-fns/locale';
 
 import { PassengerAPI } from '../../api';
 import { requestTemplates } from '../../data/requestTemplates';
@@ -27,6 +30,39 @@ import CodeEditor from '../CodeEditor';
 import { Field } from '../Field';
 import { SyntaxHighlighter } from '../SyntaxHighlighter';
 import { UserBox } from '../UserBox';
+
+const RequestBox = ({
+  time,
+  origin,
+  destination,
+  onClick,
+  isActive = false,
+}) => (
+  <HStack
+    onClick={onClick}
+    paddingX={3}
+    paddingY={3}
+    borderRadius="lg"
+    backgroundColor={!isActive ? 'gray.50' : 'gray.200'}
+    transition=".3s"
+    _hover={{
+      backgroundColor: 'gray.200',
+      cursor: 'pointer',
+    }}
+    justifyContent="space-between"
+  >
+    <VStack alignItems="stretch">
+      <Text fontSize="sm">{time}</Text>
+      <HStack>
+        <Text fontSize="sm" minWidth={150}>
+          {origin}
+        </Text>
+        <Text fontSize="sm">→</Text>
+        <Text fontSize="sm">{destination}</Text>
+      </HStack>
+    </VStack>
+  </HStack>
+);
 
 export default function PassengerPanel() {
   const [requestBody, setRequestBody] = useState(
@@ -102,9 +138,39 @@ export default function PassengerPanel() {
     <>
       <Box>
         <VStack alignItems="stretch">
-          <Box width="100%">
-            <CodeEditor value={requestBody} onValueChange={setRequestBody} />
-          </Box>
+          <HStack>
+            <VStack
+              flex={1}
+              h="18em"
+              minWidth="18rem"
+              p={3}
+              borderRadius="md"
+              borderWidth={1}
+              alignItems="stretch"
+            >
+              <HStack>
+                <Heading flex={1} size="sm" textAlign="center">
+                  乘客邀請範本
+                </Heading>
+              </HStack>
+              <VStack overflowY="scroll" alignItems="stretch">
+                {requestTemplates.map((request, index) => (
+                  <RequestBox
+                    key={`request-${index}`}
+                    onClick={() =>
+                      setRequestBody(JSON.stringify(request, null, 2))
+                    }
+                    time={format(request.time, 'LLLdo EE p', { locale: zhTW })}
+                    origin={request.origin.description}
+                    destination={request.destination.description}
+                  />
+                ))}
+              </VStack>
+            </VStack>
+            <Box width="60%" overflowY="scroll">
+              <CodeEditor value={requestBody} onValueChange={setRequestBody} />
+            </Box>
+          </HStack>
           {!requestId ? (
             <Button
               onClick={handlePostRequest}
